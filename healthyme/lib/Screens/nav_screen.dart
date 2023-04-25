@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:healthyme/Screens/profile_screen.dart';
-
 import 'chat_screen.dart';
 import 'home_screen.dart';
 import 'hub_screen.dart';
 import 'learn_screen.dart';
 
 class NavScreen extends StatefulWidget {
+
   const NavScreen({Key? key}) : super(key: key);
 
   @override

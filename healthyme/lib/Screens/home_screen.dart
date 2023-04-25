@@ -1,18 +1,70 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:healthyme/Screens/error_screen.dart';
 import 'package:healthyme/utils/data.dart';
 import 'package:healthyme/utils/home_page_button.dart';
 import 'package:healthyme/utils/menus.dart';
 import '../utils/app_bar.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
+import 'dart:convert';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  bool isLoading = true;
+  Map<String, dynamic> programData = {};
+  Map<String, dynamic> lessonData = {};
+
+  void onLoad () async {
+    Map<String, dynamic> d1 = {'String': "data"};
+    Map<String, dynamic> d2 = {'String': "data"};
+    try {
+      String url =
+          "https://632017e19f82827dcf24a655.mockapi.io/api/programs";
+      Response res = await http.get(Uri.parse(url));
+      String data = res.body;
+      programData = jsonDecode(data);
+
+      url =
+      "https://632017e19f82827dcf24a655.mockapi.io/api/lessons";
+      res = await http.get(Uri.parse(url));
+      data = res.body;
+      lessonData = jsonDecode(data);
+      setState(() {
+        isLoading = false;
+      });
+    } catch (e) {
+      Navigator.push(context, MaterialPageRoute(builder: (context)=>ErrorPage(errorMessage: e.toString(),)));
+    }
+    
+  }
+
+  @override
+  void initState() {
+    onLoad();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
     return SafeArea(
-      child: Scaffold(
+      child: isLoading?
+      Container(
+        color: Colors.white,
+        child: const Center(
+          child: CircularProgressIndicator(
+            color:  Colors.lightBlueAccent,
+            backgroundColor: Colors.white,
+          ),
+        ),
+      )
+          : Scaffold(
         extendBodyBehindAppBar: true,
         appBar: PreferredSize(
           preferredSize: Size(screenSize.width, 50.0),
@@ -53,9 +105,9 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
             ),
-            Menu(title: 'Programs for you',tag: tag1,programTitle: programTitle1, additionalText: additionalText1,imgLink: imgLink[0],),
-            Menu(title: 'Events and Experiences',tag: tag2, programTitle: programTitle2, additionalText: additionalText2,imgLink: imgLink[1], isbook: true,),
-            Menu(title: 'Lessons for you',tag: tag2, programTitle: programTitle2, additionalText: additionalText3,imgLink: imgLink[1], islock: true,),
+            Menu(count:programData['count'], title: 'Programs for you', data: programData['items'],imgLink: imgLink[0],isDefault: true,),
+            Menu(count:eventData.length, title: 'Events and Experiences', data:eventData,imgLink: imgLink[1], isDefault: false, isbook: true,),
+            Menu(count:lessonData['count'], title: 'Lessons for you',data: lessonData['items'],imgLink: imgLink[1], isDefault: false),
           ],
         ),
       ),
