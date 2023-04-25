@@ -1,4 +1,4 @@
-# healthyme
+# Heathy Me
 
 Internship Assignment 
 
